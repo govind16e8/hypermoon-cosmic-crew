@@ -7,37 +7,45 @@ interface RoadmapItem {
   title: string;
   emoji: string;
   description: string;
+  current?: boolean;
 }
 
 const roadmapItems: RoadmapItem[] = [
   {
     step: 1,
+    title: "Participation Opens",
+    emoji: "✅",
+    description: "Community begins joining and completing tasks.",
+    current: true
+  },
+  {
+    step: 2,
     title: "Token Launch",
     emoji: "🚀",
     description: "HyperMoon token goes live on multiple exchanges."
   },
   {
-    step: 2,
-    title: "Airdrop Distribution",
-    emoji: "🌱",
-    description: "Rewarding early community members with tokens."
-  },
-  {
     step: 3,
-    title: "Staking & Rewards",
-    emoji: "🌟",
-    description: "Earn passive income by staking your HyperMoon tokens."
+    title: "TGE",
+    emoji: "🧩",
+    description: "Token Generation Event begins the token distribution."
   },
   {
     step: 4,
-    title: "Exclusive NFTs",
-    emoji: "👾",
-    description: "Special NFT collections for token holders."
+    title: "Airdrop Distribution",
+    emoji: "💸",
+    description: "Rewarding early community members with tokens."
   },
   {
     step: 5,
+    title: "Staking & Rewards",
+    emoji: "💰",
+    description: "Earn passive income by staking your HyperMoon tokens."
+  },
+  {
+    step: 6,
     title: "Full DAO Governance",
-    emoji: "👽",
+    emoji: "🧠",
     description: "Community-driven decision making for the project's future."
   }
 ];
@@ -109,16 +117,27 @@ const RoadmapSection: React.FC = () => {
               style={{ transitionDelay: `${index * 200}ms` }}
             >
               {/* Circle on timeline */}
-              <div className="absolute left-1/2 top-0 w-8 h-8 bg-cosmic-purple rounded-full transform -translate-x-1/2 z-10 flex items-center justify-center">
+              <div className={`absolute left-1/2 top-0 w-8 h-8 ${
+                item.current ? 'bg-cosmic-purple ring-4 ring-cosmic-purple/30 animate-pulse' : 'bg-cosmic-deep-purple'
+              } rounded-full transform -translate-x-1/2 z-10 flex items-center justify-center`}>
                 <span className="text-white font-bold">{item.step}</span>
               </div>
               
               {/* Content box */}
               <div className={`w-1/2 ${index % 2 === 0 ? 'pr-12' : 'pl-12'}`}>
-                <div className="bg-gradient-to-br from-cosmic-dark to-cosmic-deep-purple p-6 rounded-lg shadow-lg border border-cosmic-purple hover:shadow-cosmic-purple/30 transition-shadow duration-300">
+                <div className={`bg-gradient-to-br ${
+                  item.current 
+                    ? 'from-cosmic-deep-purple/30 to-cosmic-purple/20 border-cosmic-purple' 
+                    : 'from-cosmic-dark to-cosmic-deep-purple/80 border-cosmic-purple/50'
+                } p-6 rounded-lg shadow-lg border hover:shadow-cosmic-purple/30 transition-shadow duration-300`}>
                   <div className="flex items-center mb-4">
                     <span className="text-4xl mr-4">{item.emoji}</span>
                     <h3 className="text-2xl font-bold text-white font-orbitron">{item.title}</h3>
+                    {item.current && (
+                      <span className="ml-2 px-2 py-1 bg-cosmic-purple/20 text-cosmic-purple text-xs rounded-full border border-cosmic-purple/50">
+                        You are here
+                      </span>
+                    )}
                   </div>
                   <p className="text-gray-300">{item.description}</p>
                 </div>
