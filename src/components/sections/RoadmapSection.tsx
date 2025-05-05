@@ -1,154 +1,138 @@
 
-import React, { useEffect, useRef } from 'react';
-import { Rocket } from 'lucide-react';
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface RoadmapItem {
-  step: number;
+interface RoadmapStep {
+  id: string;
+  phase: string;
   title: string;
-  emoji: string;
   description: string;
-  current?: boolean;
+  icon: string;
+  status: 'completed' | 'current' | 'upcoming';
 }
 
-const roadmapItems: RoadmapItem[] = [
-  {
-    step: 1,
-    title: "Participation Opens",
-    emoji: "✅",
-    description: "Community begins joining and completing tasks.",
-    current: true
-  },
-  {
-    step: 2,
-    title: "Token Launch",
-    emoji: "🚀",
-    description: "HyperMoon token goes live on multiple exchanges."
-  },
-  {
-    step: 3,
-    title: "TGE",
-    emoji: "🧩",
-    description: "Token Generation Event begins the token distribution."
-  },
-  {
-    step: 4,
-    title: "Airdrop Distribution",
-    emoji: "💸",
-    description: "Rewarding early community members with tokens."
-  },
-  {
-    step: 5,
-    title: "Staking & Rewards",
-    emoji: "💰",
-    description: "Earn passive income by staking your HyperMoon tokens."
-  },
-  {
-    step: 6,
-    title: "Full DAO Governance",
-    emoji: "🧠",
-    description: "Community-driven decision making for the project's future."
-  }
-];
-
 const RoadmapSection: React.FC = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const { authState } = useAuth();
   
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      
-      const sectionTop = sectionRef.current.offsetTop;
-      const sectionHeight = sectionRef.current.offsetHeight;
-      const scrollY = window.scrollY;
-      
-      // Only check when section is in view
-      if (scrollY >= sectionTop - window.innerHeight && scrollY <= sectionTop + sectionHeight) {
-        itemRefs.current.forEach((item, index) => {
-          if (!item) return;
-          
-          const itemTop = item.offsetTop + sectionTop;
-          const triggerPoint = itemTop - window.innerHeight * 0.8;
-          
-          if (scrollY >= triggerPoint) {
-            item.classList.add('opacity-100');
-            item.classList.remove('opacity-0', 'translate-y-8');
-          } else {
-            item.classList.remove('opacity-100');
-            item.classList.add('opacity-0', 'translate-y-8');
-          }
-        });
-      }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    // Trigger once on load
-    handleScroll();
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-  
+  const roadmapSteps: RoadmapStep[] = [
+    {
+      id: 'participation',
+      phase: 'Phase 1',
+      title: 'Participation Opens',
+      description: 'Community building and early adopters join the mission.',
+      icon: '🚀',
+      status: 'current'
+    },
+    {
+      id: 'token',
+      phase: 'Phase 2',
+      title: 'Token Launch',
+      description: 'HyperMoon token officially launches on mainnet.',
+      icon: '🧩',
+      status: 'upcoming'
+    },
+    {
+      id: 'tge',
+      phase: 'Phase 3',
+      title: 'TGE',
+      description: 'Token Generation Event and initial exchange listings.',
+      icon: '📈',
+      status: 'upcoming'
+    },
+    {
+      id: 'distribution',
+      phase: 'Phase 4',
+      title: 'Airdrop Distribution',
+      description: 'All eligible participants receive their token allocation.',
+      icon: '💸',
+      status: 'upcoming'
+    },
+    {
+      id: 'staking',
+      phase: 'Phase 5',
+      title: 'Staking & Rewards',
+      description: 'Staking mechanisms and community rewards program starts.',
+      icon: '💰',
+      status: 'upcoming'
+    },
+    {
+      id: 'dao',
+      phase: 'Phase 6',
+      title: 'Full DAO Governance',
+      description: 'Community governance model fully operational.',
+      icon: '🧠',
+      status: 'upcoming'
+    }
+  ];
+
   return (
-    <section 
-      ref={sectionRef}
-      className="py-20 bg-gradient-to-b from-black to-cosmic-dark relative"
-    >
+    <section className="py-24 bg-cosmic-dark relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white font-orbitron inline-flex items-center justify-center">
-            <Rocket className="mr-4 h-10 w-10 text-cosmic-purple" />
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white font-orbitron">
             Our Cosmic Roadmap
           </h2>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            The journey to building HyperMoon's community and ecosystem
+          </p>
         </div>
         
-        <div className="relative max-w-4xl mx-auto">
-          {/* Vertical line */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-cosmic-purple transform -translate-x-1/2"></div>
+        <div className="max-w-4xl mx-auto relative">
+          {/* Vertical line connecting timeline items */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-cosmic-purple/80 via-cosmic-purple/50 to-cosmic-purple/10"></div>
           
-          {roadmapItems.map((item, index) => (
-            <div
-              key={item.step}
-              ref={el => itemRefs.current[index] = el}
-              className={`relative flex ${
+          {roadmapSteps.map((step, index) => (
+            <div 
+              key={step.id}
+              className={`flex items-center mb-16 last:mb-0 relative ${
                 index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-              } gap-8 mb-16 opacity-0 translate-y-8 transition-all duration-700 ease-out`}
-              style={{ transitionDelay: `${index * 200}ms` }}
+              }`}
             >
-              {/* Circle on timeline */}
-              <div className={`absolute left-1/2 top-0 w-8 h-8 ${
-                item.current ? 'bg-cosmic-purple ring-4 ring-cosmic-purple/30 animate-pulse' : 'bg-cosmic-deep-purple'
-              } rounded-full transform -translate-x-1/2 z-10 flex items-center justify-center`}>
-                <span className="text-white font-bold">{item.step}</span>
-              </div>
-              
               {/* Content box */}
-              <div className={`w-1/2 ${index % 2 === 0 ? 'pr-12' : 'pl-12'}`}>
-                <div className={`bg-gradient-to-br ${
-                  item.current 
-                    ? 'from-cosmic-deep-purple/30 to-cosmic-purple/20 border-cosmic-purple' 
-                    : 'from-cosmic-dark to-cosmic-deep-purple/80 border-cosmic-purple/50'
-                } p-6 rounded-lg shadow-lg border hover:shadow-cosmic-purple/30 transition-shadow duration-300`}>
-                  <div className="flex items-center mb-4">
-                    <span className="text-4xl mr-4">{item.emoji}</span>
-                    <h3 className="text-2xl font-bold text-white font-orbitron">{item.title}</h3>
-                    {item.current && (
-                      <span className="ml-2 px-2 py-1 bg-cosmic-purple/20 text-cosmic-purple text-xs rounded-full border border-cosmic-purple/50">
-                        You are here
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-gray-300">{item.description}</p>
+              <div className={`w-5/12 ${index % 2 === 0 ? 'text-right pr-8' : 'text-left pl-8'}`}>
+                <div className={`${
+                  step.status === 'completed' 
+                    ? 'text-cosmic-purple' 
+                    : step.status === 'current' 
+                      ? 'text-cosmic-pink animate-pulse' 
+                      : 'text-gray-500'
+                } mb-1 font-semibold`}>
+                  {step.phase}
                 </div>
+                <h3 className="text-2xl font-bold text-white mb-2">{step.title}</h3>
+                <p className="text-gray-300">{step.description}</p>
               </div>
               
-              {/* Empty div for spacing on the other side */}
-              <div className="w-1/2"></div>
+              {/* Center icon/marker */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                <div className={`h-16 w-16 rounded-full flex items-center justify-center text-2xl z-10 border-4 ${
+                  step.status === 'completed' 
+                    ? 'bg-cosmic-purple border-cosmic-purple' 
+                    : step.status === 'current' 
+                      ? 'bg-cosmic-pink border-cosmic-pink animate-pulse' 
+                      : 'bg-cosmic-dark border-gray-700'
+                }`}>
+                  {step.icon}
+                </div>
+                
+                {/* You are here indicator */}
+                {step.status === 'current' && authState.user && (
+                  <div className="mt-2 px-3 py-1 bg-cosmic-pink text-white text-xs rounded-full animate-bounce">
+                    You are here
+                  </div>
+                )}
+              </div>
+              
+              {/* Empty space for the opposite side */}
+              <div className="w-5/12"></div>
             </div>
           ))}
         </div>
       </div>
+      
+      {/* Decorative elements */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-cosmic-purple/10 rounded-full filter blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 w-40 h-40 bg-cosmic-pink/10 rounded-full filter blur-3xl"></div>
     </section>
   );
 };
