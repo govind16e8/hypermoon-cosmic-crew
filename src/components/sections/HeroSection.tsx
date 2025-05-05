@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import StarBackground from '@/components/StarBackground';
 import GlowButton from '@/components/GlowButton';
-import { ArrowRight } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
 const HeroSection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -31,6 +31,13 @@ const HeroSection: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const scrollToParticipation = () => {
+    const participationSection = document.getElementById('participation-section');
+    if (participationSection) {
+      participationSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   return (
     <section 
@@ -46,18 +53,26 @@ const HeroSection: React.FC = () => {
         <div className="container mx-auto px-4 py-20 text-center">
           <div className="animate-float">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 text-white font-orbitron">
-              HyperMoon <span className="text-cosmic-purple">–</span> To the Moon, Together.
+              HyperMoon <span className="text-cosmic-purple">–</span> A Token for Innovation and Community.
             </h1>
             
             <p className="text-xl md:text-2xl lg:text-3xl mb-10 text-gray-200 max-w-3xl mx-auto">
-              The meme token with cosmic ambitions. Join the ride.
+              Join us on a cosmic journey. Together, we reach new heights.
             </p>
             
-            <GlowButton size="lg" className="mt-8 px-8 py-6 text-lg">
-              Join the Crew <ArrowRight className="ml-2 h-5 w-5" />
+            <GlowButton size="lg" className="mt-8 px-8 py-6 text-lg" onClick={scrollToParticipation}>
+              Join the Crew <ArrowDown className="ml-2 h-5 w-5" />
             </GlowButton>
           </div>
         </div>
+      </div>
+      
+      {/* Scroll down indicator animation */}
+      <div 
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer"
+        onClick={scrollToParticipation}
+      >
+        <ArrowDown className="h-10 w-10 text-cosmic-purple" />
       </div>
       
       {/* Visual element: Floating moon or planet */}
