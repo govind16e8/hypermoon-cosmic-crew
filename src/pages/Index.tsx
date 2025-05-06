@@ -1,5 +1,6 @@
 
 import React, { useEffect } from 'react';
+import NavBar from '@/components/NavBar';
 import HeroSection from '@/components/sections/HeroSection';
 import AboutSection from '@/components/sections/AboutSection';
 import ParticipationSection from '@/components/sections/ParticipationSection';
@@ -8,16 +9,22 @@ import CommunitySection from '@/components/sections/CommunitySection';
 import CTASection from '@/components/sections/CTASection';
 import FooterSection from '@/components/sections/FooterSection';
 import SpaceAudioPlayer from '@/components/SpaceAudioPlayer';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index: React.FC = () => {
+  const { checkDailyStreak } = useAuth();
+  
   useEffect(() => {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
     
+    // Check daily streak for logged in users
+    checkDailyStreak();
+    
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
     };
-  }, []);
+  }, [checkDailyStreak]);
   
   // Add subtle stars/cosmic effects
   useEffect(() => {
@@ -64,6 +71,7 @@ const Index: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-cosmic-dark text-white">
+      <NavBar />
       <HeroSection />
       <AboutSection />
       <ParticipationSection />
