@@ -4,10 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import GlowButton from '@/components/GlowButton';
 import UserNav from '@/components/UserNav';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NavBar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { authState } = useAuth();
 
   // Handle scroll effect
   useEffect(() => {
@@ -21,10 +24,16 @@ const NavBar: React.FC = () => {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-      setMobileMenuOpen(false);
+    // Only scroll if we're on the home page
+    if (window.location.pathname === '/') {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+        setMobileMenuOpen(false);
+      }
+    } else {
+      // If not on home page, navigate to home and then scroll
+      window.location.href = `/#${sectionId}`;
     }
   };
 
@@ -39,11 +48,11 @@ const NavBar: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <span className="text-2xl font-bold text-white font-orbitron">
               Hyper<span className="text-cosmic-purple">Moon</span>
             </span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
@@ -54,17 +63,25 @@ const NavBar: React.FC = () => {
               Participate
             </a>
             <a
-              href="#"
-              className="text-gray-300 hover:text-cosmic-purple transition-colors"
+              onClick={() => scrollToSection('roadmap-section')}
+              className="text-gray-300 hover:text-cosmic-purple transition-colors cursor-pointer"
             >
               Roadmap
             </a>
             <a
-              href="#"
-              className="text-gray-300 hover:text-cosmic-purple transition-colors"
+              onClick={() => scrollToSection('community-section')}
+              className="text-gray-300 hover:text-cosmic-purple transition-colors cursor-pointer"
             >
               Community
             </a>
+            {authState.user && (
+              <Link 
+                to="/airdrop"
+                className="text-cosmic-purple hover:text-cosmic-pink transition-colors"
+              >
+                Airdrop
+              </Link>
+            )}
             <UserNav />
           </nav>
 
@@ -103,22 +120,30 @@ const NavBar: React.FC = () => {
                   Participate
                 </a>
                 <a
-                  href="#"
-                  className="text-gray-300 hover:text-cosmic-purple transition-colors py-2"
+                  onClick={() => scrollToSection('roadmap-section')}
+                  className="text-gray-300 hover:text-cosmic-purple transition-colors py-2 cursor-pointer"
                 >
                   Roadmap
                 </a>
                 <a
-                  href="#"
-                  className="text-gray-300 hover:text-cosmic-purple transition-colors py-2"
+                  onClick={() => scrollToSection('community-section')}
+                  className="text-gray-300 hover:text-cosmic-purple transition-colors py-2 cursor-pointer"
                 >
                   Community
                 </a>
+                {authState.user && (
+                  <Link 
+                    to="/airdrop"
+                    className="text-cosmic-purple hover:text-cosmic-pink transition-colors py-2"
+                  >
+                    Airdrop
+                  </Link>
+                )}
                 <GlowButton
-                  onClick={() => scrollToSection('participation-section')}
+                  onClick={() => authState.user ? window.location.href = '/airdrop' : scrollToSection('participation-section')}
                   className="w-full mt-2"
                 >
-                  Join the Crew
+                  {authState.user ? 'Enter Space Station' : 'Join the Crew'}
                 </GlowButton>
               </nav>
             </div>

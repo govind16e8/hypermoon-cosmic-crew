@@ -8,7 +8,7 @@ import RoadmapSection from '@/components/sections/RoadmapSection';
 import CommunitySection from '@/components/sections/CommunitySection';
 import CTASection from '@/components/sections/CTASection';
 import FooterSection from '@/components/sections/FooterSection';
-import SpaceAudioPlayer from '@/components/SpaceAudioPlayer';
+import DynamicBackground from '@/components/DynamicBackground';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Index: React.FC = () => {
@@ -21,56 +21,32 @@ const Index: React.FC = () => {
     // Check daily streak for logged in users
     checkDailyStreak();
     
+    // Create and play ambient space music
+    const audio = new Audio('/space-ambient.mp3');
+    audio.loop = true;
+    audio.volume = 0.15; // Lower volume
+    
+    // Play the audio (will be blocked in some browsers until user interacts)
+    const playMusic = () => {
+      audio.play().catch(error => {
+        console.log("Audio autoplay prevented:", error);
+      });
+    };
+    
+    // Try to autoplay, and also add event listeners to play on user interaction
+    playMusic();
+    document.addEventListener('click', playMusic, { once: true });
+    
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
+      audio.pause();
+      document.removeEventListener('click', playMusic);
     };
   }, [checkDailyStreak]);
   
-  // Add subtle stars/cosmic effects
-  useEffect(() => {
-    const createCosmicEffect = () => {
-      const star = document.createElement('div');
-      const size = Math.random() * 4 + 1;
-      star.className = 'cosmic-particle';
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-      star.style.background = 'white';
-      star.style.boxShadow = '0 0 8px rgba(255, 255, 255, 0.8)';
-      star.style.borderRadius = '50%';
-      star.style.position = 'fixed';
-      star.style.top = `${Math.random() * 100}vh`;
-      star.style.left = `${Math.random() * 100}vw`;
-      star.style.opacity = '0';
-      star.style.zIndex = '1';
-      
-      document.body.appendChild(star);
-      
-      // Animate star
-      setTimeout(() => {
-        star.style.transition = 'opacity 2s ease-in-out, transform 10s linear';
-        star.style.opacity = `${Math.random() * 0.5 + 0.2}`;
-        star.style.transform = `translateY(${Math.random() * 20 - 10}vh)`;
-        
-        // Remove after animation
-        setTimeout(() => {
-          star.style.opacity = '0';
-          setTimeout(() => {
-            document.body.removeChild(star);
-          }, 2000);
-        }, 8000);
-      }, 100);
-    };
-    
-    // Create stars randomly
-    const interval = setInterval(() => {
-      createCosmicEffect();
-    }, 2000);
-    
-    return () => clearInterval(interval);
-  }, []);
-  
   return (
     <div className="min-h-screen bg-cosmic-dark text-white">
+      <DynamicBackground />
       <NavBar />
       <HeroSection />
       <AboutSection />
@@ -79,7 +55,6 @@ const Index: React.FC = () => {
       <CommunitySection />
       <CTASection />
       <FooterSection />
-      <SpaceAudioPlayer />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 interface RoadmapStep {
   id: string;
@@ -32,16 +33,8 @@ const RoadmapSection: React.FC = () => {
       status: 'upcoming'
     },
     {
-      id: 'tge',
-      phase: 'Phase 3',
-      title: 'TGE',
-      description: 'Token Generation Event and initial exchange listings.',
-      icon: '📈',
-      status: 'upcoming'
-    },
-    {
       id: 'distribution',
-      phase: 'Phase 4',
+      phase: 'Phase 3',
       title: 'Airdrop Distribution',
       description: 'All eligible participants receive their token allocation.',
       icon: '💸',
@@ -49,7 +42,7 @@ const RoadmapSection: React.FC = () => {
     },
     {
       id: 'staking',
-      phase: 'Phase 5',
+      phase: 'Phase 4',
       title: 'Staking & Rewards',
       description: 'Staking mechanisms and community rewards program starts.',
       icon: '💰',
@@ -57,13 +50,34 @@ const RoadmapSection: React.FC = () => {
     },
     {
       id: 'dao',
-      phase: 'Phase 6',
+      phase: 'Phase 5',
       title: 'Full DAO Governance',
       description: 'Community governance model fully operational.',
       icon: '🧠',
       status: 'upcoming'
     }
   ];
+
+  // Animation variants
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.3
+      }
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.5
+      }
+    }
+  };
 
   return (
     <section className="py-24 bg-cosmic-dark relative overflow-hidden">
@@ -81,52 +95,63 @@ const RoadmapSection: React.FC = () => {
           {/* Vertical line connecting timeline items */}
           <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-cosmic-purple/80 via-cosmic-purple/50 to-cosmic-purple/10"></div>
           
-          {roadmapSteps.map((step, index) => (
-            <div 
-              key={step.id}
-              className={`flex items-center mb-16 last:mb-0 relative ${
-                index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-              }`}
-            >
-              {/* Content box */}
-              <div className={`w-5/12 ${index % 2 === 0 ? 'text-right pr-8' : 'text-left pl-8'}`}>
-                <div className={`${
-                  step.status === 'completed' 
-                    ? 'text-cosmic-purple' 
-                    : step.status === 'current' 
-                      ? 'text-cosmic-pink animate-pulse' 
-                      : 'text-gray-500'
-                } mb-1 font-semibold`}>
-                  {step.phase}
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-gray-300">{step.description}</p>
-              </div>
-              
-              {/* Center icon/marker */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-                <div className={`h-16 w-16 rounded-full flex items-center justify-center text-2xl z-10 border-4 ${
-                  step.status === 'completed' 
-                    ? 'bg-cosmic-purple border-cosmic-purple' 
-                    : step.status === 'current' 
-                      ? 'bg-cosmic-pink border-cosmic-pink animate-pulse' 
-                      : 'bg-cosmic-dark border-gray-700'
-                }`}>
-                  {step.icon}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {roadmapSteps.map((step, index) => (
+              <motion.div 
+                key={step.id}
+                className={`flex items-center mb-16 last:mb-0 relative ${
+                  index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
+                }`}
+                variants={itemVariants}
+              >
+                {/* Content box */}
+                <div className={`w-5/12 ${index % 2 === 0 ? 'text-right pr-8' : 'text-left pl-8'}`}>
+                  <div className={`${
+                    step.status === 'completed' 
+                      ? 'text-cosmic-purple' 
+                      : step.status === 'current' 
+                        ? 'text-cosmic-pink animate-pulse' 
+                        : 'text-gray-500'
+                  } mb-1 font-semibold`}>
+                    {step.phase}
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">{step.title}</h3>
+                  <p className="text-gray-300">{step.description}</p>
                 </div>
                 
-                {/* You are here indicator */}
-                {step.status === 'current' && authState.user && (
-                  <div className="mt-2 px-3 py-1 bg-cosmic-pink text-white text-xs rounded-full animate-bounce">
-                    You are here
-                  </div>
-                )}
-              </div>
-              
-              {/* Empty space for the opposite side */}
-              <div className="w-5/12"></div>
-            </div>
-          ))}
+                {/* Center icon/marker */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                  <motion.div 
+                    className={`h-16 w-16 rounded-full flex items-center justify-center text-2xl z-10 border-4 ${
+                      step.status === 'completed' 
+                        ? 'bg-cosmic-purple border-cosmic-purple' 
+                        : step.status === 'current' 
+                          ? 'bg-cosmic-pink border-cosmic-pink animate-pulse' 
+                          : 'bg-cosmic-dark border-gray-700'
+                    }`}
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    {step.icon}
+                  </motion.div>
+                  
+                  {/* You are here indicator */}
+                  {step.status === 'current' && authState.user && (
+                    <div className="mt-2 px-3 py-1 bg-cosmic-pink text-white text-xs rounded-full animate-bounce">
+                      You are here
+                    </div>
+                  )}
+                </div>
+                
+                {/* Empty space for the opposite side */}
+                <div className="w-5/12"></div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </div>
       

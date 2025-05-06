@@ -1,7 +1,7 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthState, User } from '@/types/user';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 // Mock user data - in a real app, this would come from an API/database
 const MOCK_USERS = [
@@ -108,6 +108,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Check streak
         checkDailyStreak(updatedUser);
+        
+        // Redirect to airdrop page after successful login
+        window.location.href = '/airdrop';
       } else {
         setAuthState({
           user: null,
@@ -148,6 +151,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       title: "Logged out",
       description: "You have been successfully logged out",
     });
+    
+    // Navigate to home page after logout
+    window.location.href = '/';
   };
 
   const updateUser = (userData: Partial<User>) => {
