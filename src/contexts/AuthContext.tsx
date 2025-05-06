@@ -1,6 +1,7 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthState, User } from '@/types/user';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 // Mock user data - in a real app, this would come from an API/database
@@ -63,6 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
       } catch (error) {
+        console.error("Error checking auth:", error);
         setAuthState({
           user: null,
           isLoading: false,

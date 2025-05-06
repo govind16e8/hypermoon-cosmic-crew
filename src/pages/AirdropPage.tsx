@@ -19,7 +19,29 @@ const AirdropPage: React.FC = () => {
   useEffect(() => {
     // Check daily streak for logged in users
     checkDailyStreak();
+    console.log("AirdropPage mounted, user:", authState.user);
   }, [checkDailyStreak]);
+  
+  // Add debug check for user data
+  if (!authState.user) {
+    console.log("No user found in AirdropPage");
+    return (
+      <div className="min-h-screen bg-cosmic-dark text-white flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-cosmic-purple mb-4">Authentication Required</h2>
+          <p className="mb-4">You need to be logged in to view this page</p>
+          <Button 
+            variant="outline" 
+            className="text-cosmic-purple hover:bg-cosmic-purple/10"
+            onClick={() => navigate('/')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-cosmic-dark text-white">

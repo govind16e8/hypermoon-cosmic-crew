@@ -4,15 +4,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import AirdropPage from "./pages/AirdropPage";
 import NotFound from "./pages/NotFound";
-import { useAuth } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 // Protected route component to redirect unauthenticated users
+// We need to move this component outside of the main App function
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { authState } = useAuth();
   
@@ -25,28 +25,35 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return authState.user ? <>{children}</> : <Navigate to="/" replace />;
 };
 
+// We need to separate the routes component to use the auth context
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route 
+        path="/airdrop" 
+        element={
+          <ProtectedRoute>
+            <AirdropPage />
+          </ProtectedRoute>
+        } 
+      />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route 
-              path="/airdrop" 
-              element={
-                <ProtectedRoute>
-                  <AirdropPage />
-                </ProtectedRoute>
-              } 
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <AppRoutes />
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
