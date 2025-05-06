@@ -12,21 +12,33 @@ interface RoadmapItem {
 const roadmapItems: RoadmapItem[] = [
   {
     step: 1,
-    title: "Launch",
+    title: "Token Launch",
     emoji: "🚀",
-    description: "HyperMoon token goes live. Let's start this journey!"
+    description: "HyperMoon token goes live on multiple exchanges."
   },
   {
     step: 2,
-    title: "Grow",
+    title: "Airdrop Distribution",
     emoji: "🌱",
-    description: "Building community, rewarding holders, and moon missions."
+    description: "Rewarding early community members with tokens."
   },
   {
     step: 3,
-    title: "Meme Takeover",
+    title: "Staking & Rewards",
+    emoji: "🌟",
+    description: "Earn passive income by staking your HyperMoon tokens."
+  },
+  {
+    step: 4,
+    title: "Exclusive NFTs",
+    emoji: "👾",
+    description: "Special NFT collections for token holders."
+  },
+  {
+    step: 5,
+    title: "Full DAO Governance",
     emoji: "👽",
-    description: "HyperMoon goes viral! Community-driven success!"
+    description: "Community-driven decision making for the project's future."
   }
 ];
 
@@ -79,7 +91,7 @@ const RoadmapSection: React.FC = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white font-orbitron inline-flex items-center justify-center">
             <Rocket className="mr-4 h-10 w-10 text-cosmic-purple" />
-            Our Mission to the Moon
+            Our Cosmic Roadmap
           </h2>
         </div>
         
