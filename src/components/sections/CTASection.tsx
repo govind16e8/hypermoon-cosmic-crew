@@ -4,13 +4,6 @@ import GlowButton from '@/components/GlowButton';
 import StarBackground from '@/components/StarBackground';
 
 const CTASection: React.FC = () => {
-  const scrollToParticipation = () => {
-    const participationSection = document.getElementById('participation-section');
-    if (participationSection) {
-      participationSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   return (
     <section className="py-20 bg-cosmic-dark relative overflow-hidden">
       <StarBackground className="opacity-30" />
@@ -19,16 +12,16 @@ const CTASection: React.FC = () => {
         <div className="bg-gradient-to-r from-cosmic-deep-purple/20 to-cosmic-blue/20 p-10 rounded-2xl border border-cosmic-purple/50 backdrop-blur-sm">
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 text-white font-orbitron">
-              Are You Ready to Join the HyperMoon Mission?
+              Ready to Join the Moon Mission?
             </h2>
             
             <p className="text-xl text-gray-300 mb-10">
-              Don't miss your chance to be part of the next big crypto revolution. 
+              Don't miss your chance to be part of the next big meme token revolution. 
               The future is cosmic, and it starts with HyperMoon.
             </p>
             
-            <GlowButton size="lg" className="px-10 py-7 text-xl" onClick={scrollToParticipation}>
-              Start Participating Now
+            <GlowButton size="lg" className="px-10 py-7 text-xl">
+              Buy HyperMoon Now
             </GlowButton>
           </div>
         </div>

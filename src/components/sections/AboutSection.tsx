@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { motion } from "framer-motion";
-import { Star, Zap, Users } from 'lucide-react';
 
 const AboutSection: React.FC = () => {
   return (
@@ -14,31 +13,12 @@ const AboutSection: React.FC = () => {
             </h2>
             
             <p className="text-lg md:text-xl text-gray-300 mb-6">
-              HyperMoon is a community-driven token that fuels the future of space, tech, and Web3 innovation. Take part in our mission and earn rewards.
+              A community-driven meme token, powered by space and memes. HyperMoon aims to bring fun, rewards, and cosmic energy to the crypto world.
             </p>
             
-            <div className="space-y-4 mt-8">
-              <div className="flex items-start">
-                <Star className="h-6 w-6 text-cosmic-purple mr-3 mt-1 flex-shrink-0" />
-                <p className="text-lg text-gray-300">
-                  <span className="text-white font-semibold">Earn airdrops</span> by participating in our community.
-                </p>
-              </div>
-              
-              <div className="flex items-start">
-                <Users className="h-6 w-6 text-cosmic-purple mr-3 mt-1 flex-shrink-0" />
-                <p className="text-lg text-gray-300">
-                  <span className="text-white font-semibold">Shape the future</span> with governance rights.
-                </p>
-              </div>
-              
-              <div className="flex items-start">
-                <Zap className="h-6 w-6 text-cosmic-purple mr-3 mt-1 flex-shrink-0" />
-                <p className="text-lg text-gray-300">
-                  <span className="text-white font-semibold">Exclusive NFTs</span> and access to future token utility.
-                </p>
-              </div>
-            </div>
+            <p className="text-lg md:text-xl text-gray-300">
+              Join our growing community of space explorers and meme enthusiasts as we journey together to new heights.
+            </p>
           </div>
           
           <div className="md:w-1/2 flex justify-center">
