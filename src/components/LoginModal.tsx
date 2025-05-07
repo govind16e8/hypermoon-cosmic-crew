@@ -30,11 +30,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [signupConfirm, setSignupConfirm] = useState('');
   const [forgotEmail, setForgotEmail] = useState('');
   const [activeTab, setActiveTab] = useState('login');
+  const [loginErrorType, setLoginErrorType] = useState<'wrong_password' | 'email_not_found' | null>(null);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(email, password);
-    if (!authState.error) {
+    
+    // Check the type of error and set appropriate error type
+    if (authState.error) {
+      // This is a simplified check - in a real app, you'd get specific error codes from your auth system
+      if (authState.error.includes('password')) {
+        setLoginErrorType('wrong_password');
+      } else {
+        setLoginErrorType('email_not_found');
+      }
+    } else {
+      setLoginErrorType(null);
       onClose();
     }
   };
@@ -42,9 +53,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, we would implement signup functionality here
-    // But for now we'll just display a console log
     console.log("Sign up with", signupEmail, signupPassword);
-    // We could also redirect to the login tab
+    // Redirect to the login tab
     setActiveTab('login');
   };
   
@@ -52,7 +62,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     // In a real app, we would implement forgot password functionality here
     console.log("Reset password for", forgotEmail);
-    // We could show a success message or redirect to login
+    // Show a success message or redirect to login
     setActiveTab('login');
   };
   
@@ -67,10 +77,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         </DialogHeader>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4 bg-cosmic-deep-purple/20">
-            <TabsTrigger value="login" className="data-[state=active]:bg-cosmic-purple/30">Sign In</TabsTrigger>
-            <TabsTrigger value="signup" className="data-[state=active]:bg-cosmic-purple/30">Sign Up</TabsTrigger>
-            <TabsTrigger value="forgot" className="data-[state=active]:bg-cosmic-purple/30">Forgot</TabsTrigger>
+          <TabsList className="hidden">
+            <TabsTrigger value="login">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="forgot">Forgot</TabsTrigger>
           </TabsList>
           
           <TabsContent value="login">
@@ -108,7 +118,27 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               </div>
               
               {authState.error && (
-                <div className="text-red-500 text-sm">{authState.error}</div>
+                <div className="text-red-500 text-sm flex justify-between">
+                  <span>{authState.error}</span>
+                  {loginErrorType === 'wrong_password' && (
+                    <button 
+                      type="button" 
+                      className="text-cosmic-purple hover:underline"
+                      onClick={() => setActiveTab('forgot')}
+                    >
+                      Forgot Password?
+                    </button>
+                  )}
+                  {loginErrorType === 'email_not_found' && (
+                    <button 
+                      type="button" 
+                      className="text-cosmic-purple hover:underline"
+                      onClick={() => setActiveTab('signup')}
+                    >
+                      Sign Up
+                    </button>
+                  )}
+                </div>
               )}
               
               <DialogFooter className="mt-6">
@@ -131,6 +161,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   )}
                 </GlowButton>
               </DialogFooter>
+
+              <div className="text-center pt-2 border-t border-cosmic-purple/20 mt-4">
+                <p className="text-gray-400 text-sm">
+                  Don't have an account?{" "}
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab('signup')}
+                    className="text-cosmic-purple hover:underline"
+                  >
+                    Sign Up
+                  </button>
+                </p>
+              </div>
             </form>
           </TabsContent>
           
@@ -197,6 +240,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   Create Account
                 </GlowButton>
               </DialogFooter>
+              
+              <div className="text-center pt-2 border-t border-cosmic-purple/20 mt-4">
+                <p className="text-gray-400 text-sm">
+                  Already have an account?{" "}
+                  <button 
+                    type="button"
+                    onClick={() => setActiveTab('login')}
+                    className="text-cosmic-purple hover:underline"
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </div>
             </form>
           </TabsContent>
           
