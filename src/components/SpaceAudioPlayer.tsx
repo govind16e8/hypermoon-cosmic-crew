@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX, Volume1, Volume } from 'lucide-react';
 
 const SpaceAudioPlayer: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true); // Set to true by default
   const [volume, setVolume] = useState(0.3); // Default volume
   const [showVolumeControl, setShowVolumeControl] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -14,6 +14,21 @@ const SpaceAudioPlayer: React.FC = () => {
     audioRef.current = new Audio('/space-ambient.mp3');
     audioRef.current.loop = true;
     audioRef.current.volume = volume; // Start with lower volume
+    
+    // Try to autoplay music
+    const playPromise = audioRef.current.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // Autoplay started
+          setIsPlaying(true);
+        })
+        .catch(error => {
+          // Autoplay prevented by browser
+          console.log("Audio autoplay was prevented:", error);
+          setIsPlaying(false);
+        });
+    }
     
     // Cleanup function
     return () => {

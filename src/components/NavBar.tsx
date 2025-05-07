@@ -4,10 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import GlowButton from '@/components/GlowButton';
 import UserNav from '@/components/UserNav';
+import { Link, useNavigate } from 'react-router-dom';
 
 const NavBar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Handle scroll effect
   useEffect(() => {
@@ -21,9 +23,16 @@ const NavBar: React.FC = () => {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
+    // Check if we're on the home page
+    if (window.location.pathname === '/') {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+        setMobileMenuOpen(false);
+      }
+    } else {
+      // If not on home page, navigate to home and then scroll
+      navigate('/', { state: { scrollTo: sectionId } });
       setMobileMenuOpen(false);
     }
   };
@@ -40,9 +49,9 @@ const NavBar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <span className="text-2xl font-bold text-white font-orbitron">
+            <Link to="/" className="text-2xl font-bold text-white font-orbitron">
               Hyper<span className="text-cosmic-purple">Moon</span>
-            </span>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -53,12 +62,12 @@ const NavBar: React.FC = () => {
             >
               Participate
             </a>
-            <a
-              href="#"
+            <Link
+              to="/roadmap"
               className="text-gray-300 hover:text-cosmic-purple transition-colors"
             >
               Roadmap
-            </a>
+            </Link>
             <a
               href="#"
               className="text-gray-300 hover:text-cosmic-purple transition-colors"
@@ -102,12 +111,12 @@ const NavBar: React.FC = () => {
                 >
                   Participate
                 </a>
-                <a
-                  href="#"
+                <Link
+                  to="/roadmap"
                   className="text-gray-300 hover:text-cosmic-purple transition-colors py-2"
                 >
                   Roadmap
-                </a>
+                </Link>
                 <a
                   href="#"
                   className="text-gray-300 hover:text-cosmic-purple transition-colors py-2"

@@ -1,7 +1,7 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthState, User } from '@/types/user';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 // Mock user data - in a real app, this would come from an API/database
 const MOCK_USERS = [
@@ -40,6 +40,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading: true,
     error: null
   });
+  
+  // We need this for programmatic navigation
+  const navigate = useNavigate();
 
   // Check if user is logged in from localStorage on initial load
   useEffect(() => {
@@ -108,6 +111,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Check streak
         checkDailyStreak(updatedUser);
+        
+        // Redirect to airdrop page after successful login
+        navigate('/airdrop');
       } else {
         setAuthState({
           user: null,

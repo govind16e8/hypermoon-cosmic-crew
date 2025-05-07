@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Airdrop from "./pages/Airdrop";
+import Roadmap from "./pages/Roadmap";
 import { useAuth } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/roadmap" element={<Roadmap />} />
             <Route 
               path="/airdrop" 
               element={

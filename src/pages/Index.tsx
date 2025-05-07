@@ -1,5 +1,6 @@
 
 import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import NavBar from '@/components/NavBar';
 import HeroSection from '@/components/sections/HeroSection';
 import AboutSection from '@/components/sections/AboutSection';
@@ -11,8 +12,14 @@ import FooterSection from '@/components/sections/FooterSection';
 import SpaceAudioPlayer from '@/components/SpaceAudioPlayer';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface LocationState {
+  scrollTo?: string;
+}
+
 const Index: React.FC = () => {
   const { checkDailyStreak } = useAuth();
+  const location = useLocation();
+  const state = location.state as LocationState;
   
   useEffect(() => {
     // Smooth scroll behavior
@@ -21,10 +28,20 @@ const Index: React.FC = () => {
     // Check daily streak for logged in users
     checkDailyStreak();
     
+    // Handle scrolling to section if coming from another page
+    if (state?.scrollTo) {
+      const section = document.getElementById(state.scrollTo);
+      if (section) {
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+    
     return () => {
       document.documentElement.style.scrollBehavior = 'auto';
     };
-  }, [checkDailyStreak]);
+  }, [checkDailyStreak, state]);
   
   // Add subtle stars/cosmic effects
   useEffect(() => {
