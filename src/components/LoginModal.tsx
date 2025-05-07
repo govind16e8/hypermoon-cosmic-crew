@@ -12,9 +12,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Lock, LoaderCircle } from 'lucide-react';
+import { Mail, Lock, LoaderCircle, Check } from 'lucide-react';
 import GlowButton from '@/components/GlowButton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot 
+} from "@/components/ui/input-otp";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -31,6 +36,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [activeTab, setActiveTab] = useState('login');
   const [loginErrorType, setLoginErrorType] = useState<'wrong_password' | 'email_not_found' | null>(null);
+  const [showOtpVerification, setShowOtpVerification] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +61,42 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would implement signup functionality here
-    console.log("Sign up with", signupEmail, signupPassword);
-    // Redirect to the login tab
-    setActiveTab('login');
+    // In a real app, we would send a request to the server to send an OTP to the user's email
+    console.log("Sign up initiated for", signupEmail);
+    
+    // Simulate sending OTP
+    setShowOtpVerification(true);
+  };
+  
+  const verifyOTP = async () => {
+    setIsVerifying(true);
+    setVerificationError(null);
+    
+    try {
+      // In a real app, we would send the OTP to the server for verification
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+      
+      // Simulate successful verification (in a real app, this would be verified on the server)
+      // For demo, any 6-digit code is treated as correct
+      if (otp.length === 6) {
+        console.log("OTP verified successfully");
+        // Reset the signup form
+        setSignupEmail('');
+        setSignupPassword('');
+        setSignupConfirm('');
+        setShowOtpVerification(false);
+        setOtp('');
+        
+        // Redirect to login
+        setActiveTab('login');
+      } else {
+        setVerificationError("Invalid verification code. Please try again.");
+      }
+    } catch (error) {
+      setVerificationError("Failed to verify code. Please try again.");
+    } finally {
+      setIsVerifying(false);
+    }
   };
   
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -178,82 +219,175 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </TabsContent>
           
           <TabsContent value="signup">
-            <form onSubmit={handleSignup} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="signup-email" className="text-white">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="cosmic@example.com"
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                    className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                    required
-                  />
+            {!showOtpVerification ? (
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email" className="text-white">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="cosmic@example.com"
+                      value={signupEmail}
+                      onChange={(e) => setSignupEmail(e.target.value)}
+                      className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signup-password" className="text-white">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                    required
-                  />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password" className="text-white">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="signup-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                      className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="signup-confirm" className="text-white">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    id="signup-confirm"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signupConfirm}
-                    onChange={(e) => setSignupConfirm(e.target.value)}
-                    className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                    required
-                  />
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-confirm" className="text-white">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="signup-confirm"
+                      type="password"
+                      placeholder="••••••••"
+                      value={signupConfirm}
+                      onChange={(e) => setSignupConfirm(e.target.value)}
+                      className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              
-              <DialogFooter className="mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setActiveTab('login')}
-                  className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
-                >
-                  Back to Login
-                </Button>
-                <GlowButton type="submit">
-                  Create Account
-                </GlowButton>
-              </DialogFooter>
-              
-              <div className="text-center pt-2 border-t border-cosmic-purple/20 mt-4">
-                <p className="text-gray-400 text-sm">
-                  Already have an account?{" "}
-                  <button 
-                    type="button"
+                
+                <DialogFooter className="mt-6">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
                     onClick={() => setActiveTab('login')}
-                    className="text-cosmic-purple hover:underline"
+                    className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
                   >
-                    Sign In
-                  </button>
-                </p>
+                    Back to Login
+                  </Button>
+                  <GlowButton type="submit">
+                    Continue to Verification
+                  </GlowButton>
+                </DialogFooter>
+                
+                <div className="text-center pt-2 border-t border-cosmic-purple/20 mt-4">
+                  <p className="text-gray-400 text-sm">
+                    Already have an account?{" "}
+                    <button 
+                      type="button"
+                      onClick={() => setActiveTab('login')}
+                      className="text-cosmic-purple hover:underline"
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium text-white">Email Verification</h3>
+                  <p className="text-sm text-gray-400 mt-1">
+                    We've sent a 6-digit code to {signupEmail}. 
+                    Enter the code below to verify your email address.
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="otp" className="text-white">Verification Code</Label>
+                  <div className="flex justify-center my-4">
+                    <InputOTP 
+                      maxLength={6} 
+                      value={otp} 
+                      onChange={setOtp}
+                      containerClassName="gap-3"
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot
+                          index={0}
+                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                        />
+                        <InputOTPSlot
+                          index={1}
+                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                        />
+                        <InputOTPSlot
+                          index={2}
+                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                        />
+                        <InputOTPSlot
+                          index={3}
+                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                        />
+                        <InputOTPSlot
+                          index={4}
+                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                        />
+                        <InputOTPSlot
+                          index={5}
+                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
+                        />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </div>
+                  
+                  {verificationError && (
+                    <p className="text-red-500 text-sm">{verificationError}</p>
+                  )}
+                  
+                  <p className="text-xs text-center text-gray-400 mt-2">
+                    Didn't receive a code? 
+                    <button 
+                      type="button" 
+                      className="text-cosmic-purple hover:underline ml-1"
+                      onClick={() => console.log("Resend OTP")} // In a real app, implement resend
+                    >
+                      Resend
+                    </button>
+                  </p>
+                </div>
+                
+                <DialogFooter>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowOtpVerification(false)}
+                    className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
+                  >
+                    Back
+                  </Button>
+                  <GlowButton 
+                    onClick={verifyOTP} 
+                    disabled={otp.length !== 6 || isVerifying}
+                  >
+                    {isVerifying ? (
+                      <>
+                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                        <span>Verifying...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="h-4 w-4" />
+                        <span>Verify & Create Account</span>
+                      </>
+                    )}
+                  </GlowButton>
+                </DialogFooter>
               </div>
-            </form>
+            )}
           </TabsContent>
           
           <TabsContent value="forgot">
@@ -306,3 +440,4 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default LoginModal;
+
