@@ -47,9 +47,14 @@ const NavBar: React.FC = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo with icon */}
           <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-white font-orbitron">
+            <Link to="/" className="flex items-center text-2xl font-bold text-white font-orbitron">
+              <img 
+                src="/lovable-uploads/d33f823d-0fb9-4e10-8cfb-b52e2e7675fc.png" 
+                alt="Planet Logo" 
+                className="h-8 w-8 mr-2" 
+              />
               Hyper<span className="text-cosmic-purple">Moon</span>
             </Link>
           </div>

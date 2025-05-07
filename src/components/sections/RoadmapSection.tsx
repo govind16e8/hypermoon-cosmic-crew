@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -32,16 +31,8 @@ const RoadmapSection: React.FC = () => {
       status: 'upcoming'
     },
     {
-      id: 'tge',
-      phase: 'Phase 3',
-      title: 'TGE',
-      description: 'Token Generation Event and initial exchange listings.',
-      icon: '📈',
-      status: 'upcoming'
-    },
-    {
       id: 'distribution',
-      phase: 'Phase 4',
+      phase: 'Phase 3',
       title: 'Airdrop Distribution',
       description: 'All eligible participants receive their token allocation.',
       icon: '💸',
@@ -49,7 +40,7 @@ const RoadmapSection: React.FC = () => {
     },
     {
       id: 'staking',
-      phase: 'Phase 5',
+      phase: 'Phase 4',
       title: 'Staking & Rewards',
       description: 'Staking mechanisms and community rewards program starts.',
       icon: '💰',
@@ -57,7 +48,7 @@ const RoadmapSection: React.FC = () => {
     },
     {
       id: 'dao',
-      phase: 'Phase 6',
+      phase: 'Phase 5',
       title: 'Full DAO Governance',
       description: 'Community governance model fully operational.',
       icon: '🧠',
