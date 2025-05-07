@@ -5,7 +5,6 @@ import NavBar from '@/components/NavBar';
 import HeroSection from '@/components/sections/HeroSection';
 import AboutSection from '@/components/sections/AboutSection';
 import ParticipationSection from '@/components/sections/ParticipationSection';
-import RoadmapSection from '@/components/sections/RoadmapSection';
 import CommunitySection from '@/components/sections/CommunitySection';
 import CTASection from '@/components/sections/CTASection';
 import FooterSection from '@/components/sections/FooterSection';
@@ -92,7 +91,6 @@ const Index: React.FC = () => {
       <HeroSection />
       <AboutSection />
       <ParticipationSection />
-      <RoadmapSection />
       <CommunitySection />
       <CTASection />
       <FooterSection />
