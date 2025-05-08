@@ -1,32 +1,32 @@
 
 import React from 'react';
-import { Link } from 'lucide-react';
+import { Link as LinkIcon } from 'lucide-react';
 
 const FooterSection: React.FC = () => {
   return (
-    <footer className="py-10 bg-black text-gray-400 relative overflow-hidden">
+    <footer className="py-8 md:py-10 bg-black text-gray-400 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-6 md:mb-0">
+          <div className="mb-6 md:mb-0 text-center md:text-left">
             <h3 className="text-xl font-orbitron text-cosmic-purple mb-2">HyperMoon</h3>
             <p className="text-sm">The cosmic meme token</p>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-6 mb-6 md:mb-0">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 mb-6 md:mb-0">
             <a href="#" className="text-sm hover:text-cosmic-purple transition-colors">Terms of Service</a>
             <a href="#" className="text-sm hover:text-cosmic-purple transition-colors">Privacy Policy</a>
             <a href="#" className="text-sm hover:text-cosmic-purple transition-colors">
               <span className="flex items-center">
-                <Link className="h-4 w-4 mr-1" />
+                <LinkIcon className="h-4 w-4 mr-1" />
                 Whitepaper
               </span>
             </a>
           </div>
         </div>
         
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+        <div className="border-t border-gray-800 mt-6 md:mt-8 pt-6 md:pt-8 text-center">
           <p className="text-sm">&copy; 2025 HyperMoon Project. All rights reserved.</p>
-          <p className="text-xs mt-2 text-gray-600">
+          <p className="text-xs mt-2 text-gray-600 max-w-2xl mx-auto">
             This website is for entertainment purposes only. 
             HyperMoon is a meme token with no intrinsic value or financial return expectation.
           </p>

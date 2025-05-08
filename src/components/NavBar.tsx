@@ -23,17 +23,18 @@ const NavBar: React.FC = () => {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
+    // Close mobile menu first
+    setMobileMenuOpen(false);
+    
     // Check if we're on the home page
     if (window.location.pathname === '/') {
       const section = document.getElementById(sectionId);
       if (section) {
         section.scrollIntoView({ behavior: 'smooth' });
-        setMobileMenuOpen(false);
       }
     } else {
       // If not on home page, navigate to home and then scroll
       navigate('/', { state: { scrollTo: sectionId } });
-      setMobileMenuOpen(false);
     }
   };
 
@@ -49,18 +50,18 @@ const NavBar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo with icon */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center text-2xl font-bold text-white font-orbitron">
+            <Link to="/" className="flex items-center text-xl sm:text-2xl font-bold text-white font-orbitron">
               <img 
                 src="/lovable-uploads/d33f823d-0fb9-4e10-8cfb-b52e2e7675fc.png" 
                 alt="Planet Logo" 
-                className="h-8 w-8 mr-2" 
+                className="h-7 w-7 sm:h-8 sm:w-8 mr-2" 
               />
               Hyper<span className="text-cosmic-purple">Moon</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             <a
               onClick={() => scrollToSection('participation-section')}
               className="text-gray-300 hover:text-cosmic-purple transition-colors cursor-pointer"
@@ -83,11 +84,12 @@ const NavBar: React.FC = () => {
           </nav>
 
           {/* Mobile menu button */}
-          <div className="flex md:hidden items-center space-x-4">
+          <div className="flex md:hidden items-center space-x-2">
             <UserNav />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-white p-2"
+              aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6" />
