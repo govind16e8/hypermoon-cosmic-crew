@@ -79,14 +79,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const network = await provider.getNetwork();
       const chainId = network.chainId;
       
-      // For demo purposes, you might want to show a message if user is not on the right network
-      // This example accepts any network, but you could restrict to specific ones
-      
-      // Create user object
-      const updatedUser = {
+      // Create user object with a generated email-like field based on wallet address
+      const updatedUser: User = {
         id: address,
+        email: `${address.substring(0, 8)}@wallet.crypto`, // Generate an email-like identifier
         walletAddress: address,
-        chainId: chainId.toString(),
         username: `${address.substring(0, 6)}...${address.substring(38)}`,
         createdAt: new Date(),
         lastLoginAt: new Date(),

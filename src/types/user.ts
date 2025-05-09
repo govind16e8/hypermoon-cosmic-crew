@@ -1,7 +1,7 @@
 
 export interface User {
   id: string;
-  email: string;
+  email?: string; // Make email optional with '?'
   walletAddress?: string;
   username?: string;
   createdAt: Date;
