@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogIn, UserIcon, Award, Calendar, Users, LogOut } from 'lucide-react';
+import { Wallet, Award, Calendar, Users, LogOut } from 'lucide-react';
 import LoginModal from '@/components/LoginModal';
 
 const UserNav: React.FC = () => {
@@ -26,7 +26,7 @@ const UserNav: React.FC = () => {
     setIsLoginModalOpen(false);
   };
   
-  // If user is not logged in, show login button
+  // If user is not logged in, show connect wallet button
   if (!authState.user) {
     return (
       <>
@@ -35,21 +35,18 @@ const UserNav: React.FC = () => {
           className="border-cosmic-purple/30 text-cosmic-purple hover:bg-cosmic-purple/10"
           onClick={openLoginModal}
         >
-          <LogIn className="h-4 w-4 mr-2" />
-          Sign In
+          <Wallet className="h-4 w-4 mr-2" />
+          Connect Wallet
         </Button>
         <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
       </>
     );
   }
   
-  // User initials for avatar fallback
+  // Get initials from wallet address for avatar fallback
   const getInitials = () => {
-    if (authState.user?.username) {
-      return authState.user.username.slice(0, 2).toUpperCase();
-    }
-    if (authState.user?.email) {
-      return authState.user.email.slice(0, 2).toUpperCase();
+    if (authState.user?.walletAddress) {
+      return authState.user.walletAddress.substring(2, 4).toUpperCase();
     }
     return 'HM';
   };
@@ -62,7 +59,7 @@ const UserNav: React.FC = () => {
           className="relative h-10 w-10 rounded-full hover:bg-cosmic-purple/10 border border-cosmic-purple/30"
         >
           <Avatar className="h-9 w-9">
-            <AvatarImage src="/avatar-placeholder.png" alt="User Avatar" />
+            <AvatarImage src="/avatar-placeholder.png" alt="Wallet Avatar" />
             <AvatarFallback className="bg-cosmic-dark text-cosmic-purple">
               {getInitials()}
             </AvatarFallback>
@@ -78,14 +75,12 @@ const UserNav: React.FC = () => {
             <p className="text-sm font-medium text-cosmic-purple">
               {authState.user?.username || 'Cosmic Explorer'}
             </p>
-            <p className="text-xs text-gray-400">{authState.user?.email}</p>
+            <p className="text-xs text-gray-400 truncate" title={authState.user?.walletAddress}>
+              {authState.user?.walletAddress}
+            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-cosmic-purple/30" />
-        <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-cosmic-purple/10 cursor-pointer">
-          <UserIcon className="mr-2 h-4 w-4 text-cosmic-purple" />
-          <span>Profile</span>
-        </DropdownMenuItem>
         <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-cosmic-purple/10 flex justify-between cursor-pointer">
           <div className="flex items-center">
             <Award className="mr-2 h-4 w-4 text-cosmic-purple" />
@@ -113,7 +108,7 @@ const UserNav: React.FC = () => {
           onClick={logout}
         >
           <LogOut className="mr-2 h-4 w-4 text-cosmic-purple" />
-          <span>Log out</span>
+          <span>Disconnect Wallet</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

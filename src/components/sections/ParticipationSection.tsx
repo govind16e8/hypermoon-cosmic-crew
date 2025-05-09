@@ -5,6 +5,7 @@ import GlowButton from '@/components/GlowButton';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginModal from '@/components/LoginModal';
+import { Wallet } from 'lucide-react';
 
 const ParticipationSection: React.FC = () => {
   const { authState } = useAuth();
@@ -54,7 +55,7 @@ const ParticipationSection: React.FC = () => {
             <p className="text-gray-300 mb-8">
               {authState.user 
                 ? "Continue to your personal dashboard to track your progress, complete tasks, and earn rewards."
-                : "Sign in to complete tasks, earn rewards, and bring others on the mission."}
+                : "Connect your wallet to complete tasks, earn rewards, and bring others on the mission."}
             </p>
             
             <GlowButton 
@@ -62,7 +63,14 @@ const ParticipationSection: React.FC = () => {
               className="px-8 py-6 text-lg"
               onClick={handleParticipate}
             >
-              {authState.user ? "Enter Your Dashboard" : "Enter the Space Station"}
+              {authState.user ? (
+                "Enter Your Dashboard"
+              ) : (
+                <>
+                  <Wallet className="h-5 w-5 mr-2" />
+                  Launch Mission Control
+                </>
+              )}
             </GlowButton>
           </motion.div>
           

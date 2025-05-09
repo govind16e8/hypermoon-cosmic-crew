@@ -2,29 +2,11 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthState, User } from '@/types/user';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-
-// Mock user data - in a real app, this would come from an API/database
-const MOCK_USERS = [
-  {
-    id: 'user1',
-    email: 'demo@hypermoon.io',
-    walletAddress: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-    username: 'cosmicuser',
-    createdAt: new Date('2025-01-01'),
-    lastLoginAt: new Date(),
-    referralCode: 'COSMIC123',
-    referredBy: undefined,
-    completedTasks: ['telegram', 'twitter'],
-    referralCount: 3,
-    streakCount: 5,
-    lastStreak: new Date(),
-    points: 250
-  }
-];
+import { ethers } from 'ethers';
 
 interface AuthContextType {
   authState: AuthState;
-  login: (email: string, password: string) => Promise<void>;
+  connectWallet: () => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   completeTask: (taskId: string) => void;
@@ -78,65 +60,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Mock login function - in real app, would call an API
-  const login = async (email: string, password: string) => {
-    setAuthState({ ...authState, isLoading: true });
+  const connectWallet = async () => {
+    setAuthState({ ...authState, isLoading: true, error: null });
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Find user with matching email
-      const user = MOCK_USERS.find(u => u.email === email);
-      
-      if (user) {
-        // Update last login time
-        const updatedUser = {
-          ...user,
-          lastLoginAt: new Date()
-        };
-        
-        // Save to localStorage
-        localStorage.setItem('hypermoon_user', JSON.stringify(updatedUser));
-        
-        setAuthState({
-          user: updatedUser,
-          isLoading: false,
-          error: null
-        });
-        
-        toast({
-          title: "Login successful",
-          description: `Welcome back, ${updatedUser.username || email}!`,
-        });
-        
-        // Check streak
-        checkDailyStreak(updatedUser);
-        
-        // Redirect to airdrop page after successful login
-        navigate('/airdrop');
-      } else {
-        setAuthState({
-          user: null,
-          isLoading: false,
-          error: 'Invalid email or password'
-        });
-        
-        toast({
-          title: "Login failed",
-          description: "Invalid email or password",
-          variant: "destructive"
-        });
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed! Please install MetaMask to connect your wallet.");
       }
-    } catch (error) {
+      
+      // Request account access
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
+      
+      // Get chain ID
+      const network = await provider.getNetwork();
+      const chainId = network.chainId;
+      
+      // For demo purposes, you might want to show a message if user is not on the right network
+      // This example accepts any network, but you could restrict to specific ones
+      
+      // Create user object
+      const updatedUser = {
+        id: address,
+        walletAddress: address,
+        chainId: chainId.toString(),
+        username: `${address.substring(0, 6)}...${address.substring(38)}`,
+        createdAt: new Date(),
+        lastLoginAt: new Date(),
+        referralCode: `COSMIC${address.substring(0, 5)}`,
+        referredBy: undefined,
+        completedTasks: [],
+        referralCount: 0,
+        streakCount: 1,
+        lastStreak: new Date(),
+        points: 50  // Award initial points for connecting wallet
+      };
+      
+      // Save to localStorage
+      localStorage.setItem('hypermoon_user', JSON.stringify(updatedUser));
+      
       setAuthState({
-        user: null,
+        user: updatedUser,
         isLoading: false,
-        error: 'Login failed'
+        error: null
       });
       
       toast({
-        title: "Login failed",
-        description: "An error occurred during login",
+        title: "Wallet connected",
+        description: `Connected with ${updatedUser.username}`,
+      });
+      
+      // Check streak
+      checkDailyStreak(updatedUser);
+      
+      // Redirect to airdrop page after successful login
+      navigate('/airdrop');
+    } catch (error) {
+      console.error("Wallet connection error:", error);
+      setAuthState({
+        user: null,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to connect wallet'
+      });
+      
+      toast({
+        title: "Connection failed",
+        description: error instanceof Error ? error.message : 'Failed to connect wallet',
         variant: "destructive"
       });
     }
@@ -151,8 +143,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     
     toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
+      title: "Wallet disconnected",
+      description: "You have been successfully disconnected",
     });
   };
 
@@ -287,7 +279,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider 
       value={{ 
         authState, 
-        login, 
+        connectWallet, 
         logout, 
         updateUser,
         completeTask,

@@ -9,17 +9,9 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Lock, LoaderCircle, Check } from 'lucide-react';
+import { LoaderCircle, Wallet } from 'lucide-react';
 import GlowButton from '@/components/GlowButton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot 
-} from "@/components/ui/input-otp";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -27,84 +19,13 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  const { login, authState } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupConfirm, setSignupConfirm] = useState('');
-  const [forgotEmail, setForgotEmail] = useState('');
-  const [activeTab, setActiveTab] = useState('login');
-  const [loginErrorType, setLoginErrorType] = useState<'wrong_password' | 'email_not_found' | null>(null);
-  const [showOtpVerification, setShowOtpVerification] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const { connectWallet, authState } = useAuth();
   
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await login(email, password);
-    
-    // Check the type of error and set appropriate error type
-    if (authState.error) {
-      // This is a simplified check - in a real app, you'd get specific error codes from your auth system
-      if (authState.error.includes('password')) {
-        setLoginErrorType('wrong_password');
-      } else {
-        setLoginErrorType('email_not_found');
-      }
-    } else {
-      setLoginErrorType(null);
+  const handleConnectWallet = async () => {
+    await connectWallet();
+    if (!authState.error) {
       onClose();
     }
-  };
-  
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, we would send a request to the server to send an OTP to the user's email
-    console.log("Sign up initiated for", signupEmail);
-    
-    // Simulate sending OTP
-    setShowOtpVerification(true);
-  };
-  
-  const verifyOTP = async () => {
-    setIsVerifying(true);
-    setVerificationError(null);
-    
-    try {
-      // In a real app, we would send the OTP to the server for verification
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-      
-      // Simulate successful verification (in a real app, this would be verified on the server)
-      // For demo, any 6-digit code is treated as correct
-      if (otp.length === 6) {
-        console.log("OTP verified successfully");
-        // Reset the signup form
-        setSignupEmail('');
-        setSignupPassword('');
-        setSignupConfirm('');
-        setShowOtpVerification(false);
-        setOtp('');
-        
-        // Redirect to login
-        setActiveTab('login');
-      } else {
-        setVerificationError("Invalid verification code. Please try again.");
-      }
-    } catch (error) {
-      setVerificationError("Failed to verify code. Please try again.");
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-  
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, we would implement forgot password functionality here
-    console.log("Reset password for", forgotEmail);
-    // Show a success message or redirect to login
-    setActiveTab('login');
   };
   
   return (
@@ -113,326 +34,50 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         <DialogHeader>
           <DialogTitle className="text-2xl text-cosmic-purple">Join the Moon Crew</DialogTitle>
           <DialogDescription className="text-gray-300">
-            Sign in to track your progress and earn more rewards
+            Connect your wallet to track your progress and earn more rewards
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="hidden">
-            <TabsTrigger value="login">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            <TabsTrigger value="forgot">Forgot</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="login">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="cosmic@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-white">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                    required
-                  />
-                </div>
-              </div>
-              
-              {authState.error && (
-                <div className="text-red-500 text-sm flex justify-between">
-                  <span>{authState.error}</span>
-                  {loginErrorType === 'wrong_password' && (
-                    <button 
-                      type="button" 
-                      className="text-cosmic-purple hover:underline"
-                      onClick={() => setActiveTab('forgot')}
-                    >
-                      Forgot Password?
-                    </button>
-                  )}
-                  {loginErrorType === 'email_not_found' && (
-                    <button 
-                      type="button" 
-                      className="text-cosmic-purple hover:underline"
-                      onClick={() => setActiveTab('signup')}
-                    >
-                      Sign Up
-                    </button>
-                  )}
-                </div>
+        <div className="py-6">
+          <div className="bg-cosmic-deep-purple/20 border border-cosmic-purple/30 rounded-lg p-6 text-center">
+            <div className="w-16 h-16 bg-cosmic-purple/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Wallet className="h-8 w-8 text-cosmic-purple" />
+            </div>
+            
+            <h3 className="text-xl font-semibold text-white mb-2">Connect with MetaMask</h3>
+            <p className="text-gray-400 mb-6">
+              Connect your MetaMask wallet to access the HyperMoon airdrop dashboard and track your rewards.
+            </p>
+            
+            <GlowButton 
+              onClick={handleConnectWallet} 
+              disabled={authState.isLoading} 
+              className="w-full"
+              size="lg"
+            >
+              {authState.isLoading ? (
+                <>
+                  <LoaderCircle className="h-5 w-5 mr-2 animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  <Wallet className="h-5 w-5 mr-2" />
+                  Connect Wallet
+                </>
               )}
-              
-              <DialogFooter className="mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={onClose}
-                  className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
-                >
-                  Cancel
-                </Button>
-                <GlowButton type="submit" disabled={authState.isLoading}>
-                  {authState.isLoading ? (
-                    <>
-                      <LoaderCircle className="h-4 w-4 animate-spin" />
-                      <span>Signing in...</span>
-                    </>
-                  ) : (
-                    <span>Sign In</span>
-                  )}
-                </GlowButton>
-              </DialogFooter>
-
-              <div className="text-center pt-2 border-t border-cosmic-purple/20 mt-4">
-                <p className="text-gray-400 text-sm">
-                  Don't have an account?{" "}
-                  <button 
-                    type="button"
-                    onClick={() => setActiveTab('signup')}
-                    className="text-cosmic-purple hover:underline"
-                  >
-                    Sign Up
-                  </button>
-                </p>
-              </div>
-            </form>
-          </TabsContent>
-          
-          <TabsContent value="signup">
-            {!showOtpVerification ? (
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-white">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="cosmic@example.com"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-white">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="signup-confirm" className="text-white">Confirm Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <Input
-                      id="signup-confirm"
-                      type="password"
-                      placeholder="••••••••"
-                      value={signupConfirm}
-                      onChange={(e) => setSignupConfirm(e.target.value)}
-                      className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <DialogFooter className="mt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setActiveTab('login')}
-                    className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
-                  >
-                    Back to Login
-                  </Button>
-                  <GlowButton type="submit">
-                    Continue to Verification
-                  </GlowButton>
-                </DialogFooter>
-                
-                <div className="text-center pt-2 border-t border-cosmic-purple/20 mt-4">
-                  <p className="text-gray-400 text-sm">
-                    Already have an account?{" "}
-                    <button 
-                      type="button"
-                      onClick={() => setActiveTab('login')}
-                      className="text-cosmic-purple hover:underline"
-                    >
-                      Sign In
-                    </button>
-                  </p>
-                </div>
-              </form>
-            ) : (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium text-white">Email Verification</h3>
-                  <p className="text-sm text-gray-400 mt-1">
-                    We've sent a 6-digit code to {signupEmail}. 
-                    Enter the code below to verify your email address.
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="otp" className="text-white">Verification Code</Label>
-                  <div className="flex justify-center my-4">
-                    <InputOTP 
-                      maxLength={6} 
-                      value={otp} 
-                      onChange={setOtp}
-                      containerClassName="gap-3"
-                    >
-                      <InputOTPGroup>
-                        <InputOTPSlot
-                          index={0}
-                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                        />
-                        <InputOTPSlot
-                          index={1}
-                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                        />
-                        <InputOTPSlot
-                          index={2}
-                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                        />
-                        <InputOTPSlot
-                          index={3}
-                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                        />
-                        <InputOTPSlot
-                          index={4}
-                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                        />
-                        <InputOTPSlot
-                          index={5}
-                          className="bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                        />
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-                  
-                  {verificationError && (
-                    <p className="text-red-500 text-sm">{verificationError}</p>
-                  )}
-                  
-                  <p className="text-xs text-center text-gray-400 mt-2">
-                    Didn't receive a code? 
-                    <button 
-                      type="button" 
-                      className="text-cosmic-purple hover:underline ml-1"
-                      onClick={() => console.log("Resend OTP")} // In a real app, implement resend
-                    >
-                      Resend
-                    </button>
-                  </p>
-                </div>
-                
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => setShowOtpVerification(false)}
-                    className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
-                  >
-                    Back
-                  </Button>
-                  <GlowButton 
-                    onClick={verifyOTP} 
-                    disabled={otp.length !== 6 || isVerifying}
-                  >
-                    {isVerifying ? (
-                      <>
-                        <LoaderCircle className="h-4 w-4 animate-spin" />
-                        <span>Verifying...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Check className="h-4 w-4" />
-                        <span>Verify & Create Account</span>
-                      </>
-                    )}
-                  </GlowButton>
-                </DialogFooter>
-              </div>
+            </GlowButton>
+            
+            {authState.error && (
+              <p className="mt-4 text-red-500 text-sm">{authState.error}</p>
             )}
-          </TabsContent>
+          </div>
           
-          <TabsContent value="forgot">
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="forgot-email" className="text-white">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    id="forgot-email"
-                    type="email"
-                    placeholder="cosmic@example.com"
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    className="pl-10 bg-cosmic-deep-purple/20 border-cosmic-purple/30 text-white"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <p className="text-gray-300 text-sm">
-                Enter your email address and we'll send you a link to reset your password.
-              </p>
-              
-              <DialogFooter className="mt-6">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setActiveTab('login')}
-                  className="border-cosmic-purple/30 text-gray-300 hover:bg-cosmic-purple/10"
-                >
-                  Back to Login
-                </Button>
-                <GlowButton type="submit">
-                  Reset Password
-                </GlowButton>
-              </DialogFooter>
-            </form>
-          </TabsContent>
-        </Tabs>
-        
-        <div className="text-center mt-4">
-          <p className="text-gray-400 text-sm">
-            Demo credentials: demo@hypermoon.io / any password
-          </p>
+          <div className="mt-6 text-center">
+            <p className="text-gray-400 text-sm">
+              By connecting your wallet, you agree to our <a href="#" className="text-cosmic-purple hover:underline">Terms of Service</a> and <a href="#" className="text-cosmic-purple hover:underline">Privacy Policy</a>.
+            </p>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
@@ -440,4 +85,3 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default LoginModal;
-

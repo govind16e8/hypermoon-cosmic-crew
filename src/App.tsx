@@ -11,6 +11,13 @@ import Airdrop from "./pages/Airdrop";
 import Roadmap from "./pages/Roadmap";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Add ethereum to window type
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 const queryClient = new QueryClient();
 
 // Protected route component to redirect unauthenticated users
