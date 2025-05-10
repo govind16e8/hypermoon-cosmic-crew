@@ -18,11 +18,23 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
+// Add type definitions for window objects
+declare global {
+  interface Window {
+    ethereum?: any;
+    solana?: any;
+    solflare?: any;
+  }
+}
+
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
-  const { connectWallet, authState } = useAuth();
+  const { connectWallet, authState, detectWallets } = useAuth();
   
-  const handleConnectWallet = async () => {
-    await connectWallet();
+  // Get available wallets
+  const availableWallets = detectWallets();
+  
+  const handleConnectWallet = async (walletType: 'ethereum' | 'solana') => {
+    await connectWallet(walletType);
     if (!authState.error) {
       onClose();
     }
@@ -44,29 +56,40 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               <Wallet className="h-8 w-8 text-cosmic-purple" />
             </div>
             
-            <h3 className="text-xl font-semibold text-white mb-2">Connect with MetaMask</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">Choose Your Wallet</h3>
             <p className="text-gray-400 mb-6">
-              Connect your MetaMask wallet to access the HyperMoon airdrop dashboard and track your rewards.
+              Connect your wallet to access the HyperMoon airdrop dashboard and track your rewards.
             </p>
             
-            <GlowButton 
-              onClick={handleConnectWallet} 
-              disabled={authState.isLoading} 
-              className="w-full"
-              size="lg"
-            >
-              {authState.isLoading ? (
-                <>
-                  <LoaderCircle className="h-5 w-5 mr-2 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                <>
-                  <Wallet className="h-5 w-5 mr-2" />
-                  Connect Wallet
-                </>
-              )}
-            </GlowButton>
+            <div className="space-y-3">
+              {availableWallets.map((wallet) => (
+                <GlowButton 
+                  key={wallet.name}
+                  onClick={() => handleConnectWallet(wallet.type)} 
+                  disabled={authState.isLoading} 
+                  className="w-full flex items-center justify-center"
+                  size="lg"
+                >
+                  {authState.isLoading ? (
+                    <>
+                      <LoaderCircle className="h-5 w-5 mr-2 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      {wallet.icon && (
+                        <img 
+                          src={wallet.icon} 
+                          alt={`${wallet.name} logo`} 
+                          className="h-5 w-5 mr-2"
+                        />
+                      )}
+                      {wallet.installed ? `Connect with ${wallet.name}` : `Install ${wallet.name}`}
+                    </>
+                  )}
+                </GlowButton>
+              ))}
+            </div>
             
             {authState.error && (
               <p className="mt-4 text-red-500 text-sm">{authState.error}</p>

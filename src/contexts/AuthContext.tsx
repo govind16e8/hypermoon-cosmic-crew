@@ -1,16 +1,27 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthState, User } from '@/types/user';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { ethers } from 'ethers';
+import * as solanaWeb3 from '@solana/web3.js';
+
+// Define wallet types for detection
+interface WalletInfo {
+  name: string;
+  type: 'ethereum' | 'solana';
+  installed: boolean;
+  icon?: string;
+}
 
 interface AuthContextType {
   authState: AuthState;
-  connectWallet: () => Promise<void>;
+  connectWallet: (walletType: 'ethereum' | 'solana') => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   completeTask: (taskId: string) => void;
   checkDailyStreak: () => void;
+  detectWallets: () => WalletInfo[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -59,31 +70,100 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
-  // Mock login function - in real app, would call an API
-  const connectWallet = async () => {
+  // Detect available wallets
+  const detectWallets = (): WalletInfo[] => {
+    const wallets: WalletInfo[] = [];
+    
+    // Check for MetaMask (Ethereum)
+    if (typeof window !== 'undefined' && window.ethereum) {
+      wallets.push({
+        name: 'MetaMask',
+        type: 'ethereum',
+        installed: true,
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg'
+      });
+    }
+    
+    // Check for Phantom (Solana)
+    if (typeof window !== 'undefined' && window.solana && window.solana.isPhantom) {
+      wallets.push({
+        name: 'Phantom',
+        type: 'solana',
+        installed: true,
+        icon: 'https://www.phantom.app/img/logo.png'
+      });
+    }
+    
+    // Check for Solflare (Solana)
+    if (typeof window !== 'undefined' && window.solflare && window.solflare.isSolflare) {
+      wallets.push({
+        name: 'Solflare',
+        type: 'solana',
+        installed: true,
+        icon: 'https://solflare.com/logo.png'
+      });
+    }
+    
+    // If no wallets are detected, offer download options
+    if (wallets.length === 0) {
+      wallets.push({
+        name: 'MetaMask',
+        type: 'ethereum',
+        installed: false,
+        icon: 'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg'
+      });
+      wallets.push({
+        name: 'Phantom',
+        type: 'solana',
+        installed: false,
+        icon: 'https://www.phantom.app/img/logo.png'
+      });
+    }
+    
+    return wallets;
+  };
+
+  // Connect to wallet based on type
+  const connectWallet = async (walletType: 'ethereum' | 'solana' = 'ethereum') => {
     setAuthState({ ...authState, isLoading: true, error: null });
     
     try {
-      // Check if MetaMask is installed
-      if (!window.ethereum) {
-        throw new Error("MetaMask is not installed! Please install MetaMask to connect your wallet.");
+      let address = '';
+      
+      if (walletType === 'ethereum') {
+        // Ethereum wallet connection logic
+        if (!window.ethereum) {
+          throw new Error("MetaMask is not installed! Please install MetaMask to connect your wallet.");
+        }
+        
+        // Request account access
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        address = await signer.getAddress();
+        
+      } else if (walletType === 'solana') {
+        // Solana wallet connection logic
+        if (!window.solana && !window.solflare) {
+          throw new Error("No Solana wallet detected! Please install Phantom or Solflare.");
+        }
+        
+        // Try to connect to available Solana wallet
+        const wallet = window.solana || window.solflare;
+        const response = await wallet.connect();
+        address = response.publicKey.toString();
       }
       
-      // Request account access
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-      const address = await signer.getAddress();
-      
-      // Get chain ID
-      const network = await provider.getNetwork();
-      const chainId = network.chainId;
+      if (!address) {
+        throw new Error("Failed to get wallet address");
+      }
       
       // Create user object with a generated email-like field based on wallet address
       const updatedUser: User = {
         id: address,
-        email: `${address.substring(0, 8)}@wallet.crypto`, // Generate an email-like identifier
+        email: `${address.substring(0, 8)}@wallet.crypto`,
         walletAddress: address,
+        walletType: walletType,
         username: `${address.substring(0, 6)}...${address.substring(38)}`,
         createdAt: new Date(),
         lastLoginAt: new Date(),
@@ -280,7 +360,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout, 
         updateUser,
         completeTask,
-        checkDailyStreak
+        checkDailyStreak,
+        detectWallets
       }}
     >
       {children}
