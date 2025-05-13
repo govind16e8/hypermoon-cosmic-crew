@@ -1,8 +1,9 @@
+
 export interface User {
   id: string;
   email: string;
   walletAddress?: string;
-  walletType?: 'ethereum' | 'solana';
+  walletType?: 'ethereum';
   walletAge?: number; // in days
   walletBalance?: number;
   username?: string;

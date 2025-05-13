@@ -21,8 +21,8 @@ interface LoginModalProps {
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const { connectWallet, authState } = useAuth();
   
-  const handleConnectWallet = async (walletType: 'ethereum' | 'solana') => {
-    await connectWallet(walletType);
+  const handleConnectWallet = async () => {
+    await connectWallet('ethereum');
     if (!authState.error) {
       onClose();
     }
@@ -44,14 +44,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               <Wallet className="h-8 w-8 text-cosmic-purple" />
             </div>
             
-            <h3 className="text-xl font-semibold text-white mb-2">Select Your Wallet</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">Connect Your Wallet</h3>
             <p className="text-gray-400 mb-6">
-              Connect your wallet to access the HyperMoon airdrop dashboard and track your rewards.
+              Connect your MetaMask wallet to access the HyperMoon airdrop dashboard and track your rewards.
             </p>
             
             <div className="grid grid-cols-1 gap-4">
               <GlowButton 
-                onClick={() => handleConnectWallet('ethereum')} 
+                onClick={handleConnectWallet} 
                 disabled={authState.isLoading} 
                 className="w-full"
                 size="lg"
@@ -64,26 +64,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 ) : (
                   <>
                     <Wallet className="h-5 w-5 mr-2" />
-                    Connect MetaMask (ETH)
-                  </>
-                )}
-              </GlowButton>
-              
-              <GlowButton 
-                onClick={() => handleConnectWallet('solana')} 
-                disabled={authState.isLoading} 
-                className="w-full bg-gradient-to-r from-purple-500 to-blue-500"
-                size="lg"
-              >
-                {authState.isLoading ? (
-                  <>
-                    <LoaderCircle className="h-5 w-5 mr-2 animate-spin" />
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <Wallet className="h-5 w-5 mr-2" />
-                    Connect Solana Wallet
+                    Connect MetaMask
                   </>
                 )}
               </GlowButton>

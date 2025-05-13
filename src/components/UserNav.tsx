@@ -51,7 +51,7 @@ const UserNav: React.FC = () => {
     return 'HM';
   };
 
-  const walletBadge = authState.user?.walletType === 'ethereum' ? 'ETH' : 'SOL';
+  const walletBadge = 'ETH';
   
   return (
     <DropdownMenu>
@@ -103,7 +103,7 @@ const UserNav: React.FC = () => {
             <span>Balance</span>
           </div>
           <span className="text-cosmic-pink">
-            {authState.user?.walletBalance?.toFixed(4) || '0'} {authState.user?.walletType === 'ethereum' ? 'ETH' : 'SOL'}
+            {authState.user?.walletBalance?.toFixed(4) || '0'} ETH
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-cosmic-purple/10 flex justify-between cursor-pointer">

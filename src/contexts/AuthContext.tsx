@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 
 interface AuthContextType {
   authState: AuthState;
-  connectWallet: (walletType: 'ethereum' | 'solana') => Promise<void>;
+  connectWallet: (walletType: 'ethereum') => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   completeTask: (taskId: string) => void;
@@ -60,10 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Calculate wallet age in days based on the first transaction timestamp
-  const calculateWalletAge = async (
-    address: string, 
-    walletType: 'ethereum' | 'solana'
-  ): Promise<number> => {
+  const calculateWalletAge = async (address: string): Promise<number> => {
     try {
       // For demo purposes, we're simulating the wallet age calculation
       // In a real app, you would query blockchain APIs to get the first transaction
@@ -72,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const randomDays = Math.floor(Math.random() * 365) + 1;
       
       // Log for debugging
-      console.log(`Calculated wallet age for ${walletType} wallet ${address}: ${randomDays} days`);
+      console.log(`Calculated wallet age for ETH wallet ${address}: ${randomDays} days`);
       
       return randomDays;
     } catch (error) {
@@ -82,69 +79,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Get wallet balance
-  const getWalletBalance = async (
-    address: string, 
-    walletType: 'ethereum' | 'solana'
-  ): Promise<number> => {
+  const getWalletBalance = async (address: string): Promise<number> => {
     try {
-      if (walletType === 'ethereum') {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const balance = await provider.getBalance(address);
-        const etherBalance = parseFloat(ethers.utils.formatEther(balance));
-        console.log(`Fetched ETH balance for ${address}: ${etherBalance}`);
-        return etherBalance;
-      } else {
-        // For demo purposes, simulate a Solana balance
-        // In a real app, you would use @solana/web3.js to get the actual balance
-        const solanaMockBalance = parseFloat((Math.random() * 10).toFixed(2));
-        console.log(`Fetched SOL balance for ${address}: ${solanaMockBalance}`);
-        return solanaMockBalance;
-      }
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const balance = await provider.getBalance(address);
+      const etherBalance = parseFloat(ethers.utils.formatEther(balance));
+      console.log(`Fetched ETH balance for ${address}: ${etherBalance}`);
+      return etherBalance;
     } catch (error) {
       console.error("Error fetching wallet balance:", error);
       return 0;
     }
   };
 
-  // Mock login function - in real app, would call an API
-  const connectWallet = async (walletType: 'ethereum' | 'solana' = 'ethereum') => {
+  // Connect wallet function
+  const connectWallet = async (walletType: 'ethereum' = 'ethereum') => {
     setAuthState({ ...authState, isLoading: true, error: null });
     
     try {
-      let address = '';
-      let chainId = '';
-      
-      if (walletType === 'ethereum') {
-        // Check if MetaMask is installed
-        if (!window.ethereum) {
-          throw new Error("MetaMask is not installed! Please install MetaMask to connect your wallet.");
-        }
-        
-        // Request account access
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
-        address = await signer.getAddress();
-        
-        // Get chain ID
-        const network = await provider.getNetwork();
-        chainId = network.chainId.toString();
-      } else {
-        // Mocking Solana wallet connection for now
-        address = `solana${Math.floor(Math.random() * 1000000)}`;
-        chainId = 'solana';
+      // Check if MetaMask is installed
+      if (!window.ethereum) {
+        throw new Error("MetaMask is not installed! Please install MetaMask to connect your wallet.");
       }
       
+      // Request account access
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
+      
+      // Get chain ID
+      const network = await provider.getNetwork();
+      const chainId = network.chainId.toString();
+      
       // Get wallet age and balance
-      const walletAge = await calculateWalletAge(address, walletType);
-      const walletBalance = await getWalletBalance(address, walletType);
+      const walletAge = await calculateWalletAge(address);
+      const walletBalance = await getWalletBalance(address);
       
       // Create user object with wallet age and balance
       const updatedUser: User = {
         id: address,
         email: `${address.substring(0, 6)}@hypermoon.io`,
         walletAddress: address,
-        walletType: walletType,
+        walletType: 'ethereum',
         walletAge: walletAge,
         walletBalance: walletBalance,
         username: `${address.substring(0, 6)}...${address.substring(address.length - 4)}`,
@@ -169,7 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       toast({
-        title: `${walletType === 'ethereum' ? 'ETH' : 'SOL'} wallet connected`,
+        title: `ETH wallet connected`,
         description: `Connected with ${updatedUser.username}`,
       });
       
