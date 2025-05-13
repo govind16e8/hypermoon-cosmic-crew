@@ -50,14 +50,6 @@ const UserNav: React.FC = () => {
     }
     return 'HM';
   };
-
-  // Get wallet badge text (SOL or ETH)
-  const getWalletBadge = () => {
-    if (authState.user?.walletType === 'solana') {
-      return 'SOL';
-    }
-    return 'ETH';
-  };
   
   return (
     <DropdownMenu>
@@ -73,7 +65,7 @@ const UserNav: React.FC = () => {
             </AvatarFallback>
           </Avatar>
           <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-cosmic-pink text-[10px] text-white font-bold">
-            {authState.user?.walletType === 'solana' ? 'SOL' : 'ETH'}
+            {authState.user?.streakCount || 0}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -85,9 +77,6 @@ const UserNav: React.FC = () => {
             </p>
             <p className="text-xs text-gray-400 truncate" title={authState.user?.walletAddress}>
               {authState.user?.walletAddress}
-            </p>
-            <p className="text-xs text-cosmic-pink">
-              {authState.user?.walletType === 'solana' ? 'Solana Wallet' : 'Ethereum Wallet'}
             </p>
           </div>
         </DropdownMenuLabel>
