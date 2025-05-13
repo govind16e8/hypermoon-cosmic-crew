@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Wallet, Award, Calendar, Users, LogOut } from 'lucide-react';
+import { Wallet, Award, Calendar, Users, LogOut, Database } from 'lucide-react';
 import LoginModal from '@/components/LoginModal';
 
 const UserNav: React.FC = () => {
@@ -50,6 +50,8 @@ const UserNav: React.FC = () => {
     }
     return 'HM';
   };
+
+  const walletBadge = authState.user?.walletType === 'ethereum' ? 'ETH' : 'SOL';
   
   return (
     <DropdownMenu>
@@ -65,7 +67,7 @@ const UserNav: React.FC = () => {
             </AvatarFallback>
           </Avatar>
           <span className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-cosmic-pink text-[10px] text-white font-bold">
-            {authState.user?.streakCount || 0}
+            {walletBadge}
           </span>
         </Button>
       </DropdownMenuTrigger>
@@ -94,6 +96,22 @@ const UserNav: React.FC = () => {
             <span>Streak</span>
           </div>
           <span className="text-cosmic-pink">{authState.user?.streakCount || 0} days</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-cosmic-purple/10 flex justify-between cursor-pointer">
+          <div className="flex items-center">
+            <Database className="mr-2 h-4 w-4 text-cosmic-purple" />
+            <span>Balance</span>
+          </div>
+          <span className="text-cosmic-pink">
+            {authState.user?.walletBalance?.toFixed(4) || '0'} {authState.user?.walletType === 'ethereum' ? 'ETH' : 'SOL'}
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-cosmic-purple/10 flex justify-between cursor-pointer">
+          <div className="flex items-center">
+            <Wallet className="mr-2 h-4 w-4 text-cosmic-purple" />
+            <span>Wallet Age</span>
+          </div>
+          <span className="text-cosmic-pink">{authState.user?.walletAge || '0'} days</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-cosmic-purple/10 flex justify-between cursor-pointer">
           <div className="flex items-center">
